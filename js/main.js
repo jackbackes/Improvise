@@ -1,7 +1,10 @@
 var intervalKey = null;
 
 var currentTempo = 120;
+var currentTimeSignature = [4, 4];
 var currentTimeInterval = timeInterval(currentTempo);
+var currentBeatTick = 0;
+var currentBeat = 1;
 var currentNote = {
 	ticks: 1,
 	note: 0,
@@ -48,7 +51,15 @@ function initPlay() {
 }
 
 function play() {
-	console.log(currentNote);
+	// SET BEAT
+	currentBeatTick += 1;
+	if(currentBeatTick == currentTimeSignature[1]){
+		currentBeatTick = 0
+		currentBeat = (currentBeat == currentTimeSignature[0]) ? 1 : currentBeat + 1;
+	}
+	console.log(currentBeatTick + " | " + currentBeat);
+
+	//console.log(currentNote);
 	currentNote.ticks -= 1;
 	if(currentNote.ticks == 0){
 		// SET NOTE
@@ -61,10 +72,9 @@ function play() {
 
 		// PLAY NOTE
 		MIDI.noteOn(0, currentNote.note, currentNote.velocity, 0);
-		//MIDI.noteOff(0, note, length);
 
-
-		if(currentTimeInterval != timeInterval(currentTempo)) { // Safely change tempo
+		// CHANGE TEMPO
+		if(currentTimeInterval != timeInterval(currentTempo)) {
 			currentTimeInterval = timeInterval(currentTempo);
 			console.log("HIT");
 			clearInterval(intervalKey);
@@ -200,7 +210,7 @@ function generateNoteToIntArray() {
 }
 
 function timeInterval(bpm) {
-	return (60 / bpm * 1000) / 4; // Updates on the 16th note
+	return (60 / bpm * 1000) / currentTimeSignature[1]; // Updates on the 16th note
 }
 
 
