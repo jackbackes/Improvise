@@ -1,4 +1,5 @@
 var intervalKey = null;
+var playing = false;
 
 var currentTempo = 120;
 var currentTimeSignature = [4, 4];
@@ -48,16 +49,31 @@ function init() {
 
 function initPlay() {
 	intervalKey = setInterval(function(){play()}, currentTimeInterval);
+	playing = true;
+}
+
+function stopPlay() {
+	clearInterval(intervalKey);
+	currentBeatTick = 0;
+	currentBeat = 1;
+	playing = false;
+	$(".metronome li").removeClass("active");
 }
 
 function play() {
 	// SET BEAT
+
 	currentBeatTick += 1;
 	if(currentBeatTick == currentTimeSignature[1]){
 		currentBeatTick = 0
 		currentBeat = (currentBeat == currentTimeSignature[0]) ? 1 : currentBeat + 1;
 	}
 	console.log(currentBeatTick + " | " + currentBeat);
+
+	// SET METRONOME
+	$(".metronome li").removeClass("active");
+	$(".metronome li:nth-child(" + currentBeat + ")").addClass("active");
+
 
 	//console.log(currentNote);
 	currentNote.ticks -= 1;
@@ -91,7 +107,7 @@ function events(element, data) {
 	});
 
 	$("#midi-stop").on("click", function() {
-		clearInterval(intervalKey);
+		stopPlay();
 	});
 
 	$("#section-length-weight input").on("input", function() {
@@ -125,6 +141,20 @@ function events(element, data) {
 		currentKeyType = $(this).val();
 		currentKeyNotes = generateCurrentKeyNotes(currentKey);
 		restrictKeyNotes();
+	});
+
+	$("#list-time-signature-top, #list-time-signature-bottom").on("change", function() {
+		var wasPlaying = playing;
+		if(wasPlaying)
+			stopPlay();
+		currentTimeSignature = [$("#list-time-signature-top").val(), 4];
+		var html = '';
+		for(var i = 0; i < currentTimeSignature[0]; i++) {
+			html += '<li></li>';
+		}
+		$(".metronome").html(html);
+		if(wasPlaying)
+			setTimeout(function(){ initPlay() }, 1000);
 	});
 }
 

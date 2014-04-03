@@ -14,3 +14,38 @@ hr {
 .buttons-header {
 	padding-top: 22px;
 }
+
+.metronome {
+	padding: 0;
+	margin: 35px 0 0 0;
+	list-style-type: none;
+}
+
+.metronome li {
+	background: #ccc;
+	width: 15px;
+	height: 15px;
+	border-radius: 100%;
+	margin: 0 3px;
+	display: inline-block;
+}
+
+.metronome li.active {
+	background: #428bca;
+}
+
+/* ==================================================== */
+/* SECTIONS
+/* ==================================================== */
+
+section {
+	padding: 15px 0;
+}
+
+/* ==================================================== */
+/* FOOTER
+/* ==================================================== */
+
+#footer-main {
+	padding: 25px 0 40px;
+}
