@@ -6,6 +6,7 @@ var currentTimeSignature = [4, 4];
 var currentTimeInterval = timeInterval(currentTempo);
 var currentBeatTick = 0;
 var currentBeat = 1;
+var currentMeasure = 1;
 var currentNote = {
 	ticks: 1,
 	note: 0,
@@ -16,6 +17,7 @@ var currentNoteLengthWeights = [1, 1, 1, 1, 1];
 var currentKey = "";
 var currentKeyType = "major";
 var currentKeyNotes = [];
+var currentLeftHand = "";
 
 var KEY_RANGE = [21, 108];
 var NOTE_LENGTHS = [16, 8, 4, 2, 1];
@@ -25,6 +27,12 @@ var MAJOR_CHORD = [2, 2, 1, 2, 2, 2, 1];
 var MINOR_CHORD = [2, 1, 2, 2, 1, 3, 1];
 var INT_TO_NOTE = generateIntToNoteArray();
 var NOTE_TO_INT = generateNoteToIntArray();
+var MAJOR_CHORD_NOTES = [0, 4, 7, 12];
+var MINOR_CHORD_NOTES = [0, 3, 7, 12];
+
+var CHORD_PROGRESSION = [
+	[-3, -1], [-7, 1], [0, 1], [-5, 1],
+];
 
 $(document).ready(function() {
 
@@ -47,7 +55,7 @@ function init() {
 	});
 }
 
-function initPlay() {
+function startPlay() {
 	intervalKey = setInterval(function(){play()}, currentTimeInterval);
 	playing = true;
 }
@@ -68,14 +76,12 @@ function play() {
 		currentBeatTick = 0
 		currentBeat = (currentBeat == currentTimeSignature[0]) ? 1 : currentBeat + 1;
 	}
-	console.log(currentBeatTick + " | " + currentBeat);
 
 	// SET METRONOME
 	$(".metronome li").removeClass("active");
 	$(".metronome li:nth-child(" + currentBeat + ")").addClass("active");
 
-
-	//console.log(currentNote);
+	// RIGHT HAND
 	currentNote.ticks -= 1;
 	if(currentNote.ticks == 0){
 		// SET NOTE
@@ -92,18 +98,39 @@ function play() {
 		// CHANGE TEMPO
 		if(currentTimeInterval != timeInterval(currentTempo)) {
 			currentTimeInterval = timeInterval(currentTempo);
-			console.log("HIT");
 			clearInterval(intervalKey);
-			initPlay();
+			startPlay();
 		}
 	} else if(currentNote.ticks < 0 || isNaN(currentNote.ticks)) {
 		currentNote.ticks = 0;
 	}
+
+	// LEFT HAND
+	if(currentLeftHand != "") {
+
+		// CHORDS
+		if(currentLeftHand == "chords" && currentBeat == 1 && currentBeatTick == 1) {
+			var chordInProgression = CHORD_PROGRESSION[currentMeasure];
+			console.log(chordInProgression);
+			var baseKeyName = INT_TO_NOTE[ NOTE_TO_INT[currentKey] + chordInProgression[0] ];
+			var baseKey = NOTE_TO_INT[baseKeyName + "1"];
+			
+			var chord = [];
+			var NOTES = (currentKeyType == 'major') ? MAJOR_CHORD_NOTES : MINOR_CHORD_NOTES;
+			for(i in NOTES)
+				chord.push(baseKey + NOTES[i]);
+			MIDI.chordOn(0, chord, 80, 0);
+		}
+	}
+
+	// SET MEASURE
+	if(currentBeat == 1 && currentBeatTick == 1)
+		currentMeasure = (currentMeasure == 4) ? 1 : currentMeasure + 1;
 }
 
 function events(element, data) {
 	$("#midi-play").on("click", function() {
-		initPlay();
+		startPlay();
 	});
 
 	$("#midi-stop").on("click", function() {
@@ -154,7 +181,11 @@ function events(element, data) {
 		}
 		$(".metronome").html(html);
 		if(wasPlaying)
-			setTimeout(function(){ initPlay() }, 1000);
+			setTimeout(function(){ startPlay() }, 1000);
+	});
+
+	$("input[name=radio-left-hand]").on("change", function() {
+		currentLeftHand = $(this).val();
 	});
 }
 
