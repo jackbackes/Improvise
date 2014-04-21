@@ -67,6 +67,7 @@ function stopPlay() {
 	currentMeasure = 1;
 	playing = false;
 	$(".metronome li").removeClass("active");
+	$(".measure").text("1");
 }
 
 function play() {
@@ -77,8 +78,10 @@ function play() {
 		currentBeat = (currentBeat == currentTimeSignature[0]) ? 1 : currentBeat + 1;
 
 		// SET MEASURE
-		if(currentBeat == 1)
+		if(currentBeat == 1){
 			currentMeasure = (currentMeasure == 4) ? 1 : currentMeasure + 1;
+			$(".measure").text(currentMeasure);
+		}
 	}
 
 	// SET METRONOME
