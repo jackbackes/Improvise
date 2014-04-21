@@ -64,17 +64,21 @@ function stopPlay() {
 	clearInterval(intervalKey);
 	currentBeatTick = 0;
 	currentBeat = 1;
+	currentMeasure = 1;
 	playing = false;
 	$(".metronome li").removeClass("active");
 }
 
 function play() {
-	// SET BEAT
-
+	// SET BEAT && MEASURE
 	currentBeatTick += 1;
 	if(currentBeatTick == currentTimeSignature[1]){
 		currentBeatTick = 0
 		currentBeat = (currentBeat == currentTimeSignature[0]) ? 1 : currentBeat + 1;
+
+		// SET MEASURE
+		if(currentBeat == 1)
+			currentMeasure = (currentMeasure == 4) ? 1 : currentMeasure + 1;
 	}
 
 	// SET METRONOME
@@ -110,22 +114,24 @@ function play() {
 
 		// CHORDS
 		if(currentLeftHand == "chords" && currentBeat == 1 && currentBeatTick == 1) {
-			var chordInProgression = CHORD_PROGRESSION[currentMeasure];
-			console.log(chordInProgression);
-			var baseKeyName = INT_TO_NOTE[ NOTE_TO_INT[currentKey] + chordInProgression[0] ];
-			var baseKey = NOTE_TO_INT[baseKeyName + "1"];
+			var chordInProgression = CHORD_PROGRESSION[currentMeasure - 1];
+			var baseKey = /*INT_TO_NOTE[*/ NOTE_TO_INT[currentKey + '2'] + chordInProgression[0] /*]*/;
+			/*var baseKey = NOTE_TO_INT[baseKeyName + "1"];*/
 			
 			var chord = [];
-			var NOTES = (currentKeyType == 'major') ? MAJOR_CHORD_NOTES : MINOR_CHORD_NOTES;
+			var chordType = 'major';
+			if( (currentKeyType == 'major' && chordInProgression[1] == -1) || (currentKeyType == 'minor' && chordInProgression[1] == 1) )
+				chordType = 'minor';
+			if(currentKeyType == 'minor' && chordInProgression[1] == -1)
+				baseKey--;
+			var NOTES = (chordType == 'major') ? MAJOR_CHORD_NOTES : MINOR_CHORD_NOTES;
 			for(i in NOTES)
 				chord.push(baseKey + NOTES[i]);
-			MIDI.chordOn(0, chord, 80, 0);
+			MIDI.chordOn(0, chord, 120, 0);
+
+			console.log(baseKey);
 		}
 	}
-
-	// SET MEASURE
-	if(currentBeat == 1 && currentBeatTick == 1)
-		currentMeasure = (currentMeasure == 4) ? 1 : currentMeasure + 1;
 }
 
 function events(element, data) {
