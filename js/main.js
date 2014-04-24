@@ -12,6 +12,7 @@ var currentNote = {
 	note: 0,
 	velocity: 120,
 }
+var currentChordProgression = 0;
 var currentLeftHandVelocity = 120;
 var currentKeyRange = null;
 var currentNoteLengthWeights = [1, 1, 1, 1, 1];
@@ -32,7 +33,9 @@ var MAJOR_CHORD_NOTES = [0, 4, 7, 12];
 var MINOR_CHORD_NOTES = [0, 3, 7, 12];
 
 var CHORD_PROGRESSION = [
-	[-3, -1], [-7, 1], [0, 1], [-5, 1],
+	[ [0, 1], [-5, 1], [-3, -1], [-7, 1], ],
+	[ [-3, -1], [-7, 1], [0, 1], [-5, 1], ],
+	[ [0, 1], [-3, -1], [-10, -1], [-5, 1], ],
 ];
 
 $(document).ready(function() {
@@ -117,7 +120,7 @@ function play() {
 
 		// CHORDS
 		if(currentLeftHand == "chords" && currentBeat == 1 && currentBeatTick == 1) {
-			var chordInProgression = CHORD_PROGRESSION[currentMeasure - 1];
+			var chordInProgression = CHORD_PROGRESSION[currentChordProgression][currentMeasure - 1];
 			var baseKey = /*INT_TO_NOTE[*/ NOTE_TO_INT[currentKey + '2'] + chordInProgression[0] /*]*/;
 			/*var baseKey = NOTE_TO_INT[baseKeyName + "1"];*/
 			
@@ -205,6 +208,10 @@ function events(element, data) {
 
 	$("input[name=radio-left-hand]").on("change", function() {
 		currentLeftHand = $(this).val();
+	});
+
+	$("input[name=radio-chord-progression]").on("change", function() {
+		currentChordProgression = $(this).val();
 	});
 }
 
