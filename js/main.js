@@ -10,8 +10,9 @@ var currentMeasure = 1;
 var currentNote = {
 	ticks: 1,
 	note: 0,
-	velocity: 150,
+	velocity: 120,
 }
+var currentLeftHandVelocity = 120;
 var currentKeyRange = null;
 var currentNoteLengthWeights = [1, 1, 1, 1, 1];
 var currentKey = "";
@@ -97,7 +98,6 @@ function play() {
 			currentNote.note = randomInt(currentKeyRange[0], currentKeyRange[1]);
 		else
 			currentNote.note = randomFromArray(currentKeyNotes);
-		currentNote.velocity = 150;
 
 		// PLAY NOTE
 		MIDI.noteOn(0, currentNote.note, currentNote.velocity, 0);
@@ -130,7 +130,7 @@ function play() {
 			var NOTES = (chordType == 'major') ? MAJOR_CHORD_NOTES : MINOR_CHORD_NOTES;
 			for(i in NOTES)
 				chord.push(baseKey + NOTES[i]);
-			MIDI.chordOn(0, chord, 120, 0);
+			MIDI.chordOn(0, chord, currentLeftHandVelocity, 0);
 
 			console.log(baseKey);
 		}
@@ -155,6 +155,16 @@ function events(element, data) {
 	$("#slider-tempo").on("slide", function( event, ui ) {
 		currentTempo = ui.value;
 		$("#tempo-value").text(currentTempo);
+	});
+
+	$("#slider-volume-right").on("slide", function( event, ui ) {
+		currentNote.velocity = ui.value;
+		$("#volume-right-value").text(currentNote.velocity);
+	});
+
+	$("#slider-volume-left").on("slide", function( event, ui ) {
+		currentLeftHandVelocity = ui.value;
+		$("#volume-left-value").text(currentLeftHandVelocity);
 	});
 
 	$("#slider-note-range").on( "slide", function( event, ui ) {

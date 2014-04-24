@@ -183,12 +183,42 @@
 						Chords
 					</label>
 				</div>
-				<div class="radio">
+				<!-- <div class="radio">
 					<label>
 						<input type="radio" name="radio-left-hand" id="radio-left-hand-arpeggio" value="arpeggio">
 						Arpeggio
 					</label>
-				</div>
+				</div> -->
+			</div>
+		</div>
+	</section>
+
+	<section id="section-volume">
+		<div class="row">
+			<div class="col-sm-12">
+				<h3>Volume</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2">
+				Right Hand: 
+			</div>
+			<div class="col-sm-9">
+				<div id="slider-volume-right"></div>
+			</div>
+			<div class="col-sm-1">
+				<span id="volume-right-value">120</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2">
+				Left Hand: 
+			</div>
+			<div class="col-sm-9">
+				<div id="slider-volume-left"></div>
+			</div>
+			<div class="col-sm-1">
+				<span id="volume-left-value">120</span>
 			</div>
 		</div>
 	</section>
@@ -228,6 +258,18 @@ $(function() {
 		var html = '<option value="' + note + '">' + note + '</option>';
 		$("#list-keys").append(html);
 	}
+
+	$("#slider-volume-right").slider({
+		value: 120,
+		min: 0,
+		max: 250
+	});
+
+	$("#slider-volume-left").slider({
+		value: 120,
+		min: 0,
+		max: 250
+	});
 
 });
 </script>
